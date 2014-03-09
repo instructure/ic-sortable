@@ -85,6 +85,8 @@ App.ApplicationView = Ember.View.extend({});
 App.XGroupComponent = Ember.Component.extend(Droppable, {
   attributeBindings: ['draggable'],
   draggable: "true",
+  classNames: ['x-group'],
+
   accept: {
     'text/x-item': function(event, data) {
       data = JSON.parse(data);
@@ -103,6 +105,7 @@ App.XGroupComponent = Ember.Component.extend(Droppable, {
 
 App.XItemComponent = Ember.Component.extend({
   attributeBindings: ['draggable'],
+  classNames: ['x-item'],
   draggable: "true",
 
   initDragStart: function(event) {

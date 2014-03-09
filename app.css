@@ -14,32 +14,27 @@ ul {
   margin: 10px 0;
 }
 
-#groups > li {
-  margin: 10px 0;
-  background: hsl(212, 92%, 90%);
-}
-
-li {
-  background: #fff;
+.x-item, .x-group {
   list-style-type: none;
   padding: 10px;
   margin: 5px 0;
-  cursor: -webkit-grab; cursor: -moz-grab;
+  /*cursor: -webkit-grab; cursor: -moz-grab;*/
   /*border: 1px solid #aab;*/
   border-radius: 4px;
   -webkit-user-select: none;
 }
 
-#groups > li.accepts-drag {
-  /*border-color: hsl(212, 92%, 75%);*/
-  background: hsl(212, 92%, 80%);
+.x-group {
+  margin: 10px 0;
+  background: hsl(212, 10%, 90%);
 }
 
-#bucket {
-  border-radius: 4px;
-  margin: 10px 0;
-  height: 100px;
-  background: #ccc;
-  /*background: #fcfcff;*/
+.x-item {
+  background: #fff;
+}
+
+.x-group.accepts-drag {
+  /*border-color: hsl(212, 92%, 75%);*/
+  background: hsl(212, 92%, 80%);
 }
 
