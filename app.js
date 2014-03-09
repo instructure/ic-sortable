@@ -9,8 +9,14 @@ App.ApplicationRoute = Ember.Route.extend({
 /*************************************************************/
 
 var currentDrag;
+var lastEntered;
 Ember.$(document).on('dragstart', function(event) {
   currentDrag = event.target;
+});
+
+Ember.$(document).on('dragenter', function(event) {
+  console.debug('dragenter native');
+  lastEntered = event.target;
 });
 
 var Droppable = Ember.Mixin.create({
@@ -19,6 +25,7 @@ var Droppable = Ember.Mixin.create({
   accept: {},
 
   acceptsDrag: function() {
+    console.debug('acceptsDrag', this.get('acceptType'));
     return this.get('acceptType') != null;
   }.property('acceptType'),
 
@@ -27,24 +34,31 @@ var Droppable = Ember.Mixin.create({
   },
 
   validateDragEnter: function(event) {
+    console.debug('validateDragEnter');
     if (this.dragIsSelf(event)) {
-      event.stopPropagation();
+      console.debug('dragIsSelf');
       return;
     }
-    var accepts = this.get('accepts');
     for (var i = 0, l = event.dataTransfer.types.length; i < l; i ++) {
       var type = event.dataTransfer.types[i];
       if (this.accept[type]) {
+        console.debug('acceptType', type);
         this.set('acceptType', type);
-        event.stopPropagation();
         break;
       }
     }
   }.on('dragEnter'),
 
-  resetDroppability: function(event) {
-    event.stopPropagation();
+  resetDroppability: function() {
+    console.debug('resetDroppability');
     this.set('acceptType', null);
+  },
+
+  resetDroppabilityOnDragLeave: function() {
+    console.debug('resetDroppabilityOnDragLeave', lastEntered);
+    var $el = this.$();
+    if (lastEntered === $el[0] || $el.has(lastEntered).length) return;
+    this.resetDroppability();
   }.on('dragLeave'),
 
   makeDroppable: function(event) {
@@ -87,7 +101,7 @@ App.XGroupComponent = Ember.Component.extend(Droppable, {
 });
 
 
-App.XItemComponent = Ember.Component.extend(Droppable, {
+App.XItemComponent = Ember.Component.extend({
   attributeBindings: ['draggable'],
   draggable: "true",
 

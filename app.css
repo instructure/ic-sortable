@@ -4,31 +4,40 @@ body {
   font-weight: 200;
 }
 
+h2 {
+  font-size: 100%;
+  font-weight: 200;
+}
+
 ul {
   padding: 0;
-  margin: 0;
+  margin: 10px 0;
+}
+
+#groups > li {
+  margin: 10px 0;
+  background: hsl(212, 92%, 90%);
 }
 
 li {
   background: #fff;
   list-style-type: none;
-  padding: 20px;
+  padding: 10px;
   margin: 5px 0;
-  font-size: 20px;
   cursor: -webkit-grab; cursor: -moz-grab;
-  border: 1px solid #aab;
+  /*border: 1px solid #aab;*/
   border-radius: 4px;
   -webkit-user-select: none;
 }
 
-li.accepts-drag {
-  border-color: hsl(212, 92%, 75%);
-  background: hsl(212, 92%, 95%);
+#groups > li.accepts-drag {
+  /*border-color: hsl(212, 92%, 75%);*/
+  background: hsl(212, 92%, 80%);
 }
 
 #bucket {
   border-radius: 4px;
-  margin: 20px 0;
+  margin: 10px 0;
   height: 100px;
   background: #ccc;
   /*background: #fcfcff;*/
