@@ -1,0 +1,26 @@
+<!doctype html>
+<title>dnd</title>
+<link rel="stylesheet" href="app.css">
+
+<script type="text/x-handlebars">
+<ul id="groups">
+  {{#each group in model}}
+    {{#x-group model=group tagName="li"}}
+      Group {{group.name}}
+      <ul class="group">
+        {{#each item in group.items}}
+          {{#x-item model=item tagName="li"}}
+            {{item.name}}
+          {{/x-item}}
+        {{/each}}
+      </ul>
+    {{/x-group}}
+  {{/each}}
+</ul>
+</script>
+
+<script src="bower_components/jquery/dist/jquery.js"></script>
+<script src="bower_components/handlebars/handlebars.js"></script>
+<script src="bower_components/ember/ember.js"></script>
+<script src="app.js"></script>
+
