@@ -128,29 +128,23 @@ var groups = Ember.ArrayProxy.create({
       id: 0,
       name: 'A',
       items: [
-        {sort: 0, group_id: 0, id: 1, name: 'a: foo'},
-        {sort: 1, group_id: 0, id: 0, name: 'a: bar'},
-        {sort: 2, group_id: 0, id: 2, name: 'a: baz'}
+        {sort: 0, group_id: 0, id: 1, name: 'foo'},
+        {sort: 1, group_id: 0, id: 0, name: 'bar'},
+        {sort: 2, group_id: 0, id: 2, name: 'baz'}
       ]
     },
     {
       id: 1,
       name: 'B',
       items: [
-        {sort: 0, group_id: 1, id: 0, name: 'b: foo'},
-        {sort: 1, group_id: 1, id: 1, name: 'b: bar'},
-        {sort: 2, group_id: 1, id: 2, name: 'b: baz'}
+        {sort: 0, group_id: 1, id: 3, name: 'qux'}
       ]
     },
 
     {
       id: 2,
       name: 'C',
-      items: [
-        {sort: 0, group_id: 2, id: 0, name: 'c: foo'},
-        {sort: 1, group_id: 2, id: 1, name: 'c: bar'},
-        {sort: 2, group_id: 2, id: 2, name: 'c: baz'}
-      ]
+      items: []
     }
   ]
 });

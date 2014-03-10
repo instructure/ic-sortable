@@ -44,6 +44,7 @@ ul {
 
 icon-document {
   display: inline-block;
+  vertical-align: middle;
 }
 
 [draggable] {
