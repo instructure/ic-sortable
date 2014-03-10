@@ -52,9 +52,9 @@ var Droppable = Ember.Mixin.create({
 
   droppableIsDraggable: function(event) {
     return currentDrag && (
-             currentDrag === event.target ||
-             currentDrag.contains(event.target)
-           );
+      currentDrag === event.target ||
+      currentDrag.contains(event.target)
+    );
   },
 
   resetDroppability: function() {
@@ -69,10 +69,9 @@ var Droppable = Ember.Mixin.create({
 App.ApplicationView = Ember.View.extend({});
 
 
-App.XGroupComponent = Ember.Component.extend(Droppable, {
+App.MyGroupComponent = Ember.Component.extend(Droppable, {
   attributeBindings: ['draggable'],
   draggable: "true",
-  classNames: ['x-group'],
 
   canAccept: function(event) {
     return event.dataTransfer.types.contains('text/x-item');
@@ -87,48 +86,85 @@ App.XGroupComponent = Ember.Component.extend(Droppable, {
       return;
     }
     var dragItem = dragGroup.items.findBy('id', data.id);
-    moveItem(dragItem, dragGroup, myGroup);
+    Ember.run.next(null, function() {
+      moveItem(dragItem, dragGroup, myGroup);
+    });
   }
 });
 
+App.XSortableComponent = Ember.Component.extend({
 
-App.XItemComponent = Ember.Component.extend(Droppable, {
+  model: null,
+
+  registerPlaceholder: function(placeholder) {
+    this.set('placeholder', placeholder);
+    placeholder.hide();
+  },
+
+  showPlaceholder: function() {
+    this.get('placeholder').show();
+  },
+
+  hidePlaceholder: function() {
+    this.get('placeholder').hide();
+  }
+
+});
+
+App.XSortablePlaceholderComponent = Ember.Component.extend({
+  hide: function() {
+    this.$().css('display', 'none');
+  },
+
+  show: function() {
+    this.$().css('display', '');
+  },
+
+  registerWithParent: function() {
+    this.get('parentView').registerPlaceholder(this);
+  }.on('didInsertElement')
+
+});
+
+App.XSortableItemComponent = Ember.Component.extend(Droppable, {
   attributeBindings: ['draggable'],
-  classNames: ['x-item'],
   draggable: "true",
 
   canAccept: function(event) {
     return event.dataTransfer.types.contains('text/x-item');
   },
 
-  insertPlaceHolder: function(event) {
-    if (!this.get('acceptsDrag')) return;
-    var pos = relativeClientPosition(this.$()[0], event.originalEvent);
-    // insert when
-    // - starting drag -> on self
-    // - enter list -> bottom (for now)
-    // move when:
-    // - on top half of older sibling -> above sibling
-    // - on bottom half of younger sibling -> below sibling
-    // remove when:
-    // - out of list
-    //
-    if (pos.py < 0.5) {
-      console.log('top half');
-    } else {
-      console.log('bottom half');
-    }
-  }.on('dragOver'),
-
   acceptDrop: function(event) {
     console.log('DRRRRRRRRRRRRRROOPP');
   },
 
-  // draggable stuff
+  hidePlaceholderOnDragEnd: function() {
+    this.get('parentView').hidePlaceholder();
+  }.on('dragEnd'),
+
+  //insertPlaceHolderOnDragOver: function(event) {
+    //if (!this.get('acceptsDrag')) return;
+    //var pos = relativeClientPosition(this.$()[0], event.originalEvent);
+    //// insert when
+    //// - starting drag -> on self
+    //// - enter list -> bottom (for now)
+    //// move when:
+    //// - on top half of older sibling -> above sibling
+    //// - on bottom half of younger sibling -> below sibling
+    //// remove when:
+    //// - out of list
+    ////
+    //if (pos.py < 0.5) {
+      //console.log('top half');
+    //} else {
+      //console.log('bottom half');
+    //}
+  //}.on('dragOver'),
 
   initDragStart: function(event) {
     var data = JSON.stringify(this.get('model'));
     event.dataTransfer.setData('text/x-item', data);
+    this.get('parentView').showPlaceholder();
   }.on('dragStart')
 
 });
