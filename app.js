@@ -97,21 +97,53 @@ App.XItemComponent = Ember.Component.extend(Droppable, {
   classNames: ['x-item'],
   draggable: "true",
 
-  initDragStart: function(event) {
-    var data = JSON.stringify(this.get('model'));
-    event.dataTransfer.setData('text/x-item', data);
-  }.on('dragStart'),
-
   canAccept: function(event) {
     return event.dataTransfer.types.contains('text/x-item');
   },
 
+  insertPlaceHolder: function(event) {
+    if (!this.get('acceptsDrag')) return;
+    var pos = relativeClientPosition(this.$()[0], event.originalEvent);
+    // insert when
+    // - starting drag -> on self
+    // - enter list -> bottom (for now)
+    // move when:
+    // - on top half of older sibling -> above sibling
+    // - on bottom half of younger sibling -> below sibling
+    // remove when:
+    // - out of list
+    //
+    if (pos.py < 0.5) {
+      console.log('top half');
+    } else {
+      console.log('bottom half');
+    }
+  }.on('dragOver'),
+
   acceptDrop: function(event) {
     console.log('DRRRRRRRRRRRRRROOPP');
-  }
+  },
+
+  // draggable stuff
+
+  initDragStart: function(event) {
+    var data = JSON.stringify(this.get('model'));
+    event.dataTransfer.setData('text/x-item', data);
+  }.on('dragStart')
 
 });
 
+function relativeClientPosition(el, event) {
+  var rect = el.getBoundingClientRect();
+  var x = event.clientX - rect.left;
+  var y = event.clientY - rect.top;
+  return {
+    x: x,
+    y: y,
+    px: x / rect.width,
+    py: y / rect.height
+  };
+}
 
 App.IconDocumentComponent = Ember.Component.extend({
   attributeBindings: ['width', 'height'],
