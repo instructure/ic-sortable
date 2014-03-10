@@ -46,10 +46,12 @@ var Droppable = Ember.Mixin.create({
     var type = this.get('acceptType');
     var data = event.dataTransfer.getData(type);
     this.accept[type].call(this, event, data);
-    this.resetDroppability(event);
+    this.resetDroppability();
+    event.stopPropagation();
   },
 
   allowDrop: function(event) {
+    event.stopPropagation();
     event.preventDefault();
     return false;
   },
@@ -95,7 +97,7 @@ App.XGroupComponent = Ember.Component.extend(Droppable, {
 });
 
 
-App.XItemComponent = Ember.Component.extend({
+App.XItemComponent = Ember.Component.extend(Droppable, {
   attributeBindings: ['draggable'],
   classNames: ['x-item'],
   draggable: "true",

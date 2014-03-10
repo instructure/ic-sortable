@@ -21,7 +21,6 @@ ul {
   /*cursor: -webkit-grab; cursor: -moz-grab;*/
   /*border: 1px solid #aab;*/
   border-radius: 4px;
-  -webkit-user-select: none;
 }
 
 .x-group {
@@ -38,6 +37,10 @@ ul {
   background: hsl(212, 92%, 80%);
 }
 
+.x-item.accepts-drag {
+  /*border-color: hsl(212, 92%, 75%);*/
+  background: hsl(212, 92%, 80%);
+}
 
 [draggable] {
   -moz-user-select: none;
