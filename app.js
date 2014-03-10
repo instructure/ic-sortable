@@ -17,7 +17,7 @@ Ember.$(document).on('dragstart', function(event) {
 var Droppable = Ember.Mixin.create({
 
   canAccept: function(event) {
-    return false;
+    return true;
   },
 
   classNameBindings: ['acceptsDrag'],
@@ -41,6 +41,7 @@ var Droppable = Ember.Mixin.create({
     this.acceptDrop(event);
     this.resetDroppability();
     event.stopPropagation();
+    return false;
   },
 
   allowDrop: function(event) {
@@ -50,7 +51,10 @@ var Droppable = Ember.Mixin.create({
   },
 
   droppableIsDraggable: function(event) {
-    return currentDrag === event.target || currentDrag.contains(event.target);
+    return currentDrag && (
+             currentDrag === event.target ||
+             currentDrag.contains(event.target)
+           );
   },
 
   resetDroppability: function() {
@@ -103,7 +107,7 @@ App.XItemComponent = Ember.Component.extend(Droppable, {
   },
 
   acceptDrop: function(event) {
-    console.log(event.dataTransfer.getData('text/x-item'));
+    console.log('DRRRRRRRRRRRRRROOPP');
   }
 
 });
