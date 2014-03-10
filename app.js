@@ -19,44 +19,26 @@ Ember.$(document).on('dragenter', function(event) {
   lastEntered = event.target;
 });
 
-// dragEnter
-// dragLeave
-// dragOver
-
 var Droppable = Ember.Mixin.create({
   classNameBindings: ['acceptsDrag'],
   acceptType: null,
   accept: {},
 
-  dragEnter: function(event) {
-    console.debug('dragEnter', this.get('elementId'));
-    if (this.dragIsSelf(event)) {
-      console.debug('isSelf, get out');
-      return;
+  dragOver: function(event) {
+    if (this.get('acceptsDrag')) {
+      return this.allowDrop(event);
     }
+    if (this.droppableIsSelf(event)) return;
     for (var i = 0, l = event.dataTransfer.types.length; i < l; i ++) {
       var type = event.dataTransfer.types[i];
       if (this.accept[type]) {
         this.set('acceptType', type);
-        break;
+        return this.allowDrop(event);
       }
     }
   },
 
-  dragOver: function(event) {
-    if (this.get('acceptsDrag')) {
-      console.debug('dragOver', 'acceptsDrag', this.get('elementId'));
-      event.preventDefault();
-      return false;
-    }
-  },
-
   dragLeave: function() {
-    var $el = this.$();
-    if (
-      lastEntered === $el[0] ||
-      $el.has(lastEntered).length
-    ) return;
     this.resetDroppability();
   },
 
@@ -67,11 +49,16 @@ var Droppable = Ember.Mixin.create({
     this.resetDroppability(event);
   },
 
+  allowDrop: function(event) {
+    event.preventDefault();
+    return false;
+  },
+
   acceptsDrag: function() {
     return this.get('acceptType') != null;
   }.property('acceptType'),
 
-  dragIsSelf: function(event) {
+  droppableIsSelf: function(event) {
     return event.target === currentDrag;
   },
 
