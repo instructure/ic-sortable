@@ -38,3 +38,9 @@ ul {
   background: hsl(212, 92%, 80%);
 }
 
+
+[draggable] {
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+}

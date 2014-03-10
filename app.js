@@ -10,22 +10,64 @@ App.ApplicationRoute = Ember.Route.extend({
 
 var currentDrag;
 var lastEntered;
+
 Ember.$(document).on('dragstart', function(event) {
   currentDrag = event.target;
 });
 
 Ember.$(document).on('dragenter', function(event) {
-  console.debug('dragenter native');
   lastEntered = event.target;
 });
+
+// dragEnter
+// dragLeave
+// dragOver
 
 var Droppable = Ember.Mixin.create({
   classNameBindings: ['acceptsDrag'],
   acceptType: null,
   accept: {},
 
+  dragEnter: function(event) {
+    console.debug('dragEnter', this.get('elementId'));
+    if (this.dragIsSelf(event)) {
+      console.debug('isSelf, get out');
+      return;
+    }
+    for (var i = 0, l = event.dataTransfer.types.length; i < l; i ++) {
+      var type = event.dataTransfer.types[i];
+      if (this.accept[type]) {
+        this.set('acceptType', type);
+        break;
+      }
+    }
+  },
+
+  dragOver: function(event) {
+    if (this.get('acceptsDrag')) {
+      console.debug('dragOver', 'acceptsDrag', this.get('elementId'));
+      event.preventDefault();
+      return false;
+    }
+  },
+
+  dragLeave: function() {
+    var $el = this.$();
+    if (
+      lastEntered === $el[0] ||
+      $el.has(lastEntered).length
+    ) return;
+    this.resetDroppability();
+  },
+
+  drop: function(event) {
+    var type = this.get('acceptType');
+    var data = event.dataTransfer.getData(type);
+    this.accept[type].call(this, event, data);
+    this.resetDroppability(event);
+  },
+
   acceptsDrag: function() {
-    console.debug('acceptsDrag', this.get('acceptType'));
     return this.get('acceptType') != null;
   }.property('acceptType'),
 
@@ -33,47 +75,10 @@ var Droppable = Ember.Mixin.create({
     return event.target === currentDrag;
   },
 
-  validateDragEnter: function(event) {
-    console.debug('validateDragEnter');
-    if (this.dragIsSelf(event)) {
-      console.debug('dragIsSelf');
-      return;
-    }
-    for (var i = 0, l = event.dataTransfer.types.length; i < l; i ++) {
-      var type = event.dataTransfer.types[i];
-      if (this.accept[type]) {
-        console.debug('acceptType', type);
-        this.set('acceptType', type);
-        break;
-      }
-    }
-  }.on('dragEnter'),
-
   resetDroppability: function() {
-    console.debug('resetDroppability');
     this.set('acceptType', null);
-  },
+  }
 
-  resetDroppabilityOnDragLeave: function() {
-    console.debug('resetDroppabilityOnDragLeave', lastEntered);
-    var $el = this.$();
-    if (lastEntered === $el[0] || $el.has(lastEntered).length) return;
-    this.resetDroppability();
-  }.on('dragLeave'),
-
-  makeDroppable: function(event) {
-    if (this.get('acceptsDrag')) {
-      event.preventDefault();
-      return false;
-    }
-  }.on('dragOver'),
-
-  receiveDrop: function(event) {
-    var type = this.get('acceptType');
-    var data = event.dataTransfer.getData(type);
-    this.accept[type].call(this, event, data);
-    this.resetDroppability(event);
-  }.on('drop')
 });
 
 /******************************************************************/
@@ -93,7 +98,7 @@ App.XGroupComponent = Ember.Component.extend(Droppable, {
       var myGroup = this.get('model');
       var dragGroup = findGroup(data.group_id);
       if (myGroup === dragGroup) {
-        console.debug('same group, should reorder');
+        console.debug('same group, should reorder', this.get('elementId'));
         return;
       }
       var dragItem = dragGroup.items.findBy('id', data.id);
@@ -111,40 +116,50 @@ App.XItemComponent = Ember.Component.extend({
   initDragStart: function(event) {
     var data = JSON.stringify(this.get('model'));
     event.dataTransfer.setData('text/x-item', data);
-  }.on('dragStart')
+  }.on('dragStart'),
+
+  accept: {
+    'text/x-item': function(event, data) {
+      console.log(data);
+    }
+  }
+
 });
 
 
-var groups = [
-  {
-    id: 0,
-    name: 'A',
-    items: [
-      {group_id: 0, id: 0, name: 'a: foo'},
-      {group_id: 0, id: 1, name: 'a: bar'},
-      {group_id: 0, id: 2, name: 'a: baz'}
-    ]
-  },
-  {
-    id: 1,
-    name: 'B',
-    items: [
-      {group_id: 1, id: 0, name: 'b: foo'},
-      {group_id: 1, id: 1, name: 'b: bar'},
-      {group_id: 1, id: 2, name: 'b: baz'}
-    ]
-  },
+var groups = Ember.ArrayProxy.create({
+  sortProperties: ['sort'],
+  content: [
+    {
+      id: 0,
+      name: 'A',
+      items: [
+        {sort: 0, group_id: 0, id: 1, name: 'a: foo'},
+        {sort: 1, group_id: 0, id: 0, name: 'a: bar'},
+        {sort: 2, group_id: 0, id: 2, name: 'a: baz'}
+      ]
+    },
+    {
+      id: 1,
+      name: 'B',
+      items: [
+        {sort: 0, group_id: 1, id: 0, name: 'b: foo'},
+        {sort: 1, group_id: 1, id: 1, name: 'b: bar'},
+        {sort: 2, group_id: 1, id: 2, name: 'b: baz'}
+      ]
+    },
 
-  {
-    id: 2,
-    name: 'C',
-    items: [
-      {group_id: 2, id: 0, name: 'c: foo'},
-      {group_id: 2, id: 1, name: 'c: bar'},
-      {group_id: 2, id: 2, name: 'c: baz'}
-    ]
-  }
-];
+    {
+      id: 2,
+      name: 'C',
+      items: [
+        {sort: 0, group_id: 2, id: 0, name: 'c: foo'},
+        {sort: 1, group_id: 2, id: 1, name: 'c: bar'},
+        {sort: 2, group_id: 2, id: 2, name: 'c: baz'}
+      ]
+    }
+  ]
+});
 
 function findGroups() {
   return groups;
