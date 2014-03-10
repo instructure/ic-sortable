@@ -42,6 +42,10 @@ ul {
   background: hsl(212, 92%, 80%);
 }
 
+icon-document {
+  display: inline-block;
+}
+
 [draggable] {
   -moz-user-select: none;
   -webkit-user-select: none;

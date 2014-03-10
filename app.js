@@ -9,32 +9,27 @@ App.ApplicationRoute = Ember.Route.extend({
 /*************************************************************/
 
 var currentDrag;
-var lastEntered;
 
 Ember.$(document).on('dragstart', function(event) {
   currentDrag = event.target;
 });
 
-Ember.$(document).on('dragenter', function(event) {
-  lastEntered = event.target;
-});
-
 var Droppable = Ember.Mixin.create({
+
+  canAccept: function(event) {
+    return false;
+  },
+
   classNameBindings: ['acceptsDrag'],
-  acceptType: null,
-  accept: {},
+
+  acceptsDrag: false,
 
   dragOver: function(event) {
-    if (this.get('acceptsDrag')) {
+    if (this.get('acceptsDrag')) return this.allowDrop(event);
+    if (this.droppableIsDraggable(event)) return;
+    if (this.canAccept(event)) {
+      this.set('acceptsDrag', true);
       return this.allowDrop(event);
-    }
-    if (this.droppableIsSelf(event)) return;
-    for (var i = 0, l = event.dataTransfer.types.length; i < l; i ++) {
-      var type = event.dataTransfer.types[i];
-      if (this.accept[type]) {
-        this.set('acceptType', type);
-        return this.allowDrop(event);
-      }
     }
   },
 
@@ -43,9 +38,7 @@ var Droppable = Ember.Mixin.create({
   },
 
   drop: function(event) {
-    var type = this.get('acceptType');
-    var data = event.dataTransfer.getData(type);
-    this.accept[type].call(this, event, data);
+    this.acceptDrop(event);
     this.resetDroppability();
     event.stopPropagation();
   },
@@ -56,16 +49,12 @@ var Droppable = Ember.Mixin.create({
     return false;
   },
 
-  acceptsDrag: function() {
-    return this.get('acceptType') != null;
-  }.property('acceptType'),
-
-  droppableIsSelf: function(event) {
-    return event.target === currentDrag;
+  droppableIsDraggable: function(event) {
+    return currentDrag === event.target || currentDrag.contains(event.target);
   },
 
   resetDroppability: function() {
-    this.set('acceptType', null);
+    this.set('acceptsDrag', false);
   }
 
 });
@@ -81,18 +70,20 @@ App.XGroupComponent = Ember.Component.extend(Droppable, {
   draggable: "true",
   classNames: ['x-group'],
 
-  accept: {
-    'text/x-item': function(event, data) {
-      data = JSON.parse(data);
-      var myGroup = this.get('model');
-      var dragGroup = findGroup(data.group_id);
-      if (myGroup === dragGroup) {
-        console.debug('same group, should reorder', this.get('elementId'));
-        return;
-      }
-      var dragItem = dragGroup.items.findBy('id', data.id);
-      moveItem(dragItem, dragGroup, myGroup);
+  canAccept: function(event) {
+    return event.dataTransfer.types.contains('text/x-item');
+  },
+
+  acceptDrop: function(event) {
+    var data = JSON.parse(event.dataTransfer.getData('text/x-item'));
+    var myGroup = this.get('model');
+    var dragGroup = findGroup(data.group_id);
+    if (myGroup === dragGroup) {
+      console.debug('same group, should reorder', this.get('elementId'));
+      return;
     }
+    var dragItem = dragGroup.items.findBy('id', data.id);
+    moveItem(dragItem, dragGroup, myGroup);
   }
 });
 
@@ -107,12 +98,22 @@ App.XItemComponent = Ember.Component.extend(Droppable, {
     event.dataTransfer.setData('text/x-item', data);
   }.on('dragStart'),
 
-  accept: {
-    'text/x-item': function(event, data) {
-      console.log(data);
-    }
+  canAccept: function(event) {
+    return event.dataTransfer.types.contains('text/x-item');
+  },
+
+  acceptDrop: function(event) {
+    console.log(event.dataTransfer.getData('text/x-item'));
   }
 
+});
+
+
+App.IconDocumentComponent = Ember.Component.extend({
+  attributeBindings: ['width', 'height'],
+  tagName: 'icon-document',
+  width: 16,
+  height: 16
 });
 
 
