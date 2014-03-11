@@ -70,43 +70,13 @@ var Droppable = Ember.Mixin.create({
 
 });
 
-/******************************************************************/
-
-
-App.ApplicationView = Ember.View.extend({});
-
-
-App.MyGroupComponent = Ember.Component.extend(Droppable, {
-  attributeBindings: ['draggable'],
-  draggable: "true",
-
-  canAccept: function(event) {
-    return true;
-    //return event.dataTransfer.types.contains('text/x-item');
-  },
-
-  acceptDrop: function(event) {
-    var data = JSON.parse(event.dataTransfer.getData('text/x-item'));
-    var myGroup = this.get('model');
-    var dragGroup = findGroup(data.group_id);
-    if (myGroup === dragGroup) {
-      console.debug('same group, should reorder', this.get('elementId'));
-      return;
-    }
-    var dragItem = dragGroup.items.findBy('id', data.id);
-    Ember.run.next(null, function() {
-      moveItem(dragItem, dragGroup, myGroup);
-    });
-  }
-});
-
 App.XSortableComponent = Ember.Component.extend({
 
   model: null
 
 });
 
-App.XSortableItemComponent = Ember.Component.extend(Droppable, {
+Sortable = Ember.Mixin.create(Droppable, {
 
   attributeBindings: ['draggable'],
 
@@ -123,14 +93,6 @@ App.XSortableItemComponent = Ember.Component.extend(Droppable, {
   dropBelow: false,
 
   dropAbove: false,
-
-  canAccept: function(event) {
-    return event.dataTransfer.types.contains('text/x-item');
-  },
-
-  acceptDrop: function(event) {
-    console.log('DRRRRRRRRRRRRRROOPP');
-  },
 
   setDropBelow: function() {
     // TODO: check index of siblings, don't do anything
@@ -204,6 +166,47 @@ function relativeClientPosition(el, event) {
     py: y / rect.height
   };
 }
+
+
+/******************************************************************/
+
+
+App.ApplicationView = Ember.View.extend({});
+
+
+App.MyGroupComponent = Ember.Component.extend(Droppable, {
+  attributeBindings: ['draggable'],
+  draggable: "true",
+
+  canAccept: function(event) {
+    return true;
+    //return event.dataTransfer.types.contains('text/x-item');
+  },
+
+  acceptDrop: function(event) {
+    var data = JSON.parse(event.dataTransfer.getData('text/x-item'));
+    var myGroup = this.get('model');
+    var dragGroup = findGroup(data.group_id);
+    if (myGroup === dragGroup) {
+      console.debug('same group, should reorder', this.get('elementId'));
+      return;
+    }
+    var dragItem = dragGroup.items.findBy('id', data.id);
+    Ember.run.next(null, function() {
+      moveItem(dragItem, dragGroup, myGroup);
+    });
+  }
+});
+
+App.MyItemComponent = Ember.Component.extend(Sortable, {
+  canAccept: function(event) {
+    return event.dataTransfer.types.contains('text/x-item');
+  },
+
+  acceptDrop: function(event) {
+    console.log('DRRRRRRRRRRRRRROOPP');
+  }
+});
 
 
 App.IconDocumentComponent = Ember.Component.extend({

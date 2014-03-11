@@ -7,15 +7,15 @@
     {{#each group in model}}
       {{#my-group model=group tagName="li" class="group"}}
         <h2>Group {{group.name}}</h2>
-        {{#x-sortable model=group.items tagName="ul" class="sortable-group"}}
+        <ul class="sortable-group">
           {{#each item in group.items}}
-            {{#x-sortable-item model=item tagName="li" class="item"}}
+            {{#my-item model=item tagName="li" class="item"}}
               <div class="item-content">
                 {{icon-document}} {{item.name}}
               </div>
-            {{/x-sortable-item}}
+            {{/my-item}}
           {{/each}}
-        {{/x-sortable}}
+        </ul>
       {{/my-group}}
     {{/each}}
   </ul>
