@@ -9,14 +9,9 @@ App.ApplicationRoute = Ember.Route.extend({
 /*************************************************************/
 
 var currentDrag;
-var lastEntered;
 
 Ember.$(document).on('dragstart', function(event) {
   currentDrag = event.target;
-});
-
-Ember.$(document).on('dragenter', function(event) {
-  lastEntered = event.target;
 });
 
 
@@ -70,13 +65,14 @@ var Droppable = Ember.Mixin.create({
 
 });
 
-App.XSortableComponent = Ember.Component.extend({
 
-  model: null
+var lastEntered;
 
+Ember.$(document).on('dragenter', function(event) {
+  lastEntered = event.target;
 });
 
-Sortable = Ember.Mixin.create(Droppable, {
+var Sortable = Ember.Mixin.create(Droppable, {
 
   attributeBindings: ['draggable'],
 
@@ -110,6 +106,8 @@ Sortable = Ember.Mixin.create(Droppable, {
     if (!this.get('acceptsDrag')) return;
     var pos = relativeClientPosition(this.$()[0], event.originalEvent);
     if (this.get('dropBelow')) {
+      // making assumptions that the css will make room enough for
+      // one item with these maths
       if (pos.py < 0.33) {
         this.setDropAbove();
       }
@@ -118,7 +116,7 @@ Sortable = Ember.Mixin.create(Droppable, {
         this.setDropBelow();
       }
     } else {
-      if (pos.py < .5) {
+      if (pos.py < 0.5) {
         this.setDropAbove();
       } else {
         this.setDropBelow();
@@ -132,6 +130,7 @@ Sortable = Ember.Mixin.create(Droppable, {
   },
 
   resetDropPropsOnDrop: function() {
+    this.set('droppedPosition', this.get('dropAbove') ? 'before' : 'after');
     this.resetDropProps();
   }.on('drop'),
 
@@ -143,10 +142,15 @@ Sortable = Ember.Mixin.create(Droppable, {
     }
   }.on('dragLeave'),
 
+  setEventData: function(event) {
+    event.dataTransfer.setData('text/html', this.$().html());
+  },
+
   initDragStart: function(event) {
-    var data = JSON.stringify(this.get('model'));
-    event.dataTransfer.setData('text/x-item', data);
-    Ember.run.next(this, 'set', 'isDragging', true);
+    this.setEventData(event);
+    // later because browsers clone the element in its state
+    // right now, which would have `is-dragging` styles applied
+    Ember.run.later(this, 'set', 'isDragging', true, 0);
   }.on('dragStart'),
 
   resetOnDragEnd: function() {
@@ -175,12 +179,13 @@ App.ApplicationView = Ember.View.extend({});
 
 
 App.MyGroupComponent = Ember.Component.extend(Droppable, {
+
   attributeBindings: ['draggable'],
+
   draggable: "true",
 
   canAccept: function(event) {
-    return true;
-    //return event.dataTransfer.types.contains('text/x-item');
+    return event.dataTransfer.types.contains('text/x-item');
   },
 
   acceptDrop: function(event) {
@@ -192,20 +197,38 @@ App.MyGroupComponent = Ember.Component.extend(Droppable, {
       return;
     }
     var dragItem = dragGroup.items.findBy('id', data.id);
-    Ember.run.next(null, function() {
-      moveItem(dragItem, dragGroup, myGroup);
-    });
+    moveItem(dragItem, dragGroup, myGroup);
   }
 });
 
 App.MyItemComponent = Ember.Component.extend(Sortable, {
+
+  classNameBindings: ['dropping'],
+
+  setEventData: function(event) {
+    event.dataTransfer.setData('text/x-item', JSON.stringify(this.get('model')));
+  },
+
   canAccept: function(event) {
     return event.dataTransfer.types.contains('text/x-item');
   },
 
   acceptDrop: function(event) {
-    console.log('DRRRRRRRRRRRRRROOPP');
+    this.set('dropping', true);
+    Ember.run.later(this, 'set', 'dropping', false, 150);
+    var data = JSON.parse(event.dataTransfer.getData('text/x-item'));
+    var targetGroup = findGroup(data.group_id);
+    var targetItem = targetGroup.items.findBy('id', data.id);
+    var myGroup = findGroup(this.get('model.group_id'));
+    targetGroup.items.removeObject(targetItem);
+    var index = myGroup.items.indexOf(this.get('model'));
+    if (this.get('droppedPosition') === 'after') {
+      index = index + 1;
+    };
+    targetItem.group_id = myGroup.id;
+    myGroup.items.insertAt(index, targetItem);
   }
+
 });
 
 
@@ -218,22 +241,27 @@ App.IconDocumentComponent = Ember.Component.extend({
 
 
 var groups = Ember.ArrayProxy.create({
-  sortProperties: ['sort'],
   content: [
     {
       id: 0,
       name: 'A',
       items: [
-        {sort: 0, group_id: 0, id: 1, name: 'foo'},
-        {sort: 1, group_id: 0, id: 0, name: 'bar'},
-        {sort: 2, group_id: 0, id: 2, name: 'baz'}
+        {group_id: 0, id: 1, name: 'foo'},
+        {group_id: 0, id: 2, name: 'bar'},
+        {group_id: 0, id: 3, name: 'baz'},
+        {group_id: 0, id: 4, name: 'qux'},
+        {group_id: 0, id: 5, name: 'quux'},
+        {group_id: 0, id: 6, name: 'hooba'},
+        {group_id: 0, id: 7, name: 'tuba'},
+        {group_id: 0, id: 8, name: 'ding'},
+        {group_id: 0, id: 9, name: 'dong'}
       ]
     },
     {
       id: 1,
       name: 'B',
       items: [
-        {sort: 0, group_id: 1, id: 3, name: 'qux'}
+        {group_id: 1, id: 10, name: 'qux'}
       ]
     },
 

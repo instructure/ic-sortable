@@ -28,7 +28,6 @@ ul {
 
 .item {
   list-style-type: none;
-  -webkit-transition: all 100ms linear;
 }
 
 .item-content {
@@ -49,15 +48,24 @@ ul {
 }
 
 .item.is-dragging {
-  opacity: 0.2;
+  display: none;
+  /*opacity: 0.2*/
+}
+
+.item {
+  transition: padding 150ms linear;
+}
+
+.item.dropping {
+  transition: none;
 }
 
 .item.drop-below {
-  padding-bottom: 40px;
+  padding-bottom: 42px;
 }
 
 .item.drop-above {
-  padding-top: 40px;
+  padding-top: 42px;
 }
 
 .group.accepts-drag {
@@ -71,7 +79,5 @@ icon-document {
 }
 
 [draggable] {
-  -moz-user-select: none;
-  -webkit-user-select: none;
   user-select: none;
 }
