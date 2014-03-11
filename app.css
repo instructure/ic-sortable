@@ -14,7 +14,7 @@ ul {
   margin: 10px 0;
 }
 
-.item, .group {
+.group {
   list-style-type: none;
   padding: 10px;
   /*cursor: -webkit-grab; cursor: -moz-grab;*/
@@ -27,6 +27,12 @@ ul {
 }
 
 .item {
+  list-style-type: none;
+  -webkit-transition: all 100ms linear;
+}
+
+.item-content {
+  padding: 10px;
   background: #fff;
   border-bottom: 1px solid hsl(212, 10%, 90%);
 }
@@ -42,12 +48,19 @@ ul {
   border-bottom-right-radius: 4px;
 }
 
-.group.accepts-drag {
-  /*border-color: hsl(212, 92%, 75%);*/
-  background: hsl(212, 92%, 80%);
+.item.is-dragging {
+  opacity: 0.2;
 }
 
-.item.accepts-drag {
+.item.drop-below {
+  padding-bottom: 40px;
+}
+
+.item.drop-above {
+  padding-top: 40px;
+}
+
+.group.accepts-drag {
   /*border-color: hsl(212, 92%, 75%);*/
   background: hsl(212, 92%, 80%);
 }

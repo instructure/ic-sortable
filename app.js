@@ -9,10 +9,16 @@ App.ApplicationRoute = Ember.Route.extend({
 /*************************************************************/
 
 var currentDrag;
+var lastEntered;
 
 Ember.$(document).on('dragstart', function(event) {
   currentDrag = event.target;
 });
+
+Ember.$(document).on('dragenter', function(event) {
+  lastEntered = event.target;
+});
+
 
 var Droppable = Ember.Mixin.create({
 
@@ -34,6 +40,7 @@ var Droppable = Ember.Mixin.create({
   },
 
   dragLeave: function() {
+    // TODO: stopPropagation or no?
     this.resetDroppability();
   },
 
@@ -74,7 +81,8 @@ App.MyGroupComponent = Ember.Component.extend(Droppable, {
   draggable: "true",
 
   canAccept: function(event) {
-    return event.dataTransfer.types.contains('text/x-item');
+    return true;
+    //return event.dataTransfer.types.contains('text/x-item');
   },
 
   acceptDrop: function(event) {
@@ -94,41 +102,27 @@ App.MyGroupComponent = Ember.Component.extend(Droppable, {
 
 App.XSortableComponent = Ember.Component.extend({
 
-  model: null,
-
-  registerPlaceholder: function(placeholder) {
-    this.set('placeholder', placeholder);
-    placeholder.hide();
-  },
-
-  showPlaceholder: function() {
-    this.get('placeholder').show();
-  },
-
-  hidePlaceholder: function() {
-    this.get('placeholder').hide();
-  }
-
-});
-
-App.XSortablePlaceholderComponent = Ember.Component.extend({
-  hide: function() {
-    this.$().css('display', 'none');
-  },
-
-  show: function() {
-    this.$().css('display', '');
-  },
-
-  registerWithParent: function() {
-    this.get('parentView').registerPlaceholder(this);
-  }.on('didInsertElement')
+  model: null
 
 });
 
 App.XSortableItemComponent = Ember.Component.extend(Droppable, {
+
   attributeBindings: ['draggable'],
+
   draggable: "true",
+
+  classNameBindings: [
+    'isDragging',
+    'dropBelow',
+    'dropAbove'
+  ],
+
+  isDragging: false,
+
+  dropBelow: false,
+
+  dropAbove: false,
 
   canAccept: function(event) {
     return event.dataTransfer.types.contains('text/x-item');
@@ -138,34 +132,64 @@ App.XSortableItemComponent = Ember.Component.extend(Droppable, {
     console.log('DRRRRRRRRRRRRRROOPP');
   },
 
-  hidePlaceholderOnDragEnd: function() {
-    this.get('parentView').hidePlaceholder();
-  }.on('dragEnd'),
+  setDropBelow: function() {
+    // TODO: check index of siblings, don't do anything
+    this.set('dropBelow', true);
+    this.set('dropAbove', false);
+  },
 
-  //insertPlaceHolderOnDragOver: function(event) {
-    //if (!this.get('acceptsDrag')) return;
-    //var pos = relativeClientPosition(this.$()[0], event.originalEvent);
-    //// insert when
-    //// - starting drag -> on self
-    //// - enter list -> bottom (for now)
-    //// move when:
-    //// - on top half of older sibling -> above sibling
-    //// - on bottom half of younger sibling -> below sibling
-    //// remove when:
-    //// - out of list
-    ////
-    //if (pos.py < 0.5) {
-      //console.log('top half');
-    //} else {
-      //console.log('bottom half');
-    //}
-  //}.on('dragOver'),
+  setDropAbove: function() {
+    // TODO: check index of siblings, don't do anything
+    this.set('dropAbove', true);
+    this.set('dropBelow', false);
+  },
+
+  decideToAddClassForDropAboveOrBelow: function(event) {
+    if (!this.get('acceptsDrag')) return;
+    var pos = relativeClientPosition(this.$()[0], event.originalEvent);
+    if (this.get('dropBelow')) {
+      if (pos.py < 0.33) {
+        this.setDropAbove();
+      }
+    } else if (this.get('dropAbove')) {
+      if (pos.py > 0.66) {
+        this.setDropBelow();
+      }
+    } else {
+      if (pos.py < .5) {
+        this.setDropAbove();
+      } else {
+        this.setDropBelow();
+      }
+    }
+  }.on('dragOver'),
+
+  resetDropProps: function() {
+    this.set('dropAbove', false);
+    this.set('dropBelow', false);
+  },
+
+  resetDropPropsOnDrop: function() {
+    this.resetDropProps();
+  }.on('drop'),
+
+  resetDropPropsOnLeave: function(event) {
+    var el = this.get('element');
+    // TODO: what about nested sortables, huh? did you ever think about that? HUH? WELL? DID YOU?!
+    if (el !== lastEntered && !el.contains(lastEntered)) {
+      this.resetDropProps();
+    }
+  }.on('dragLeave'),
 
   initDragStart: function(event) {
     var data = JSON.stringify(this.get('model'));
     event.dataTransfer.setData('text/x-item', data);
-    this.get('parentView').showPlaceholder();
-  }.on('dragStart')
+    Ember.run.next(this, 'set', 'isDragging', true);
+  }.on('dragStart'),
+
+  resetOnDragEnd: function() {
+    this.set('isDragging', false);
+  }.on('dragEnd')
 
 });
 
@@ -180,6 +204,7 @@ function relativeClientPosition(el, event) {
     py: y / rect.height
   };
 }
+
 
 App.IconDocumentComponent = Ember.Component.extend({
   attributeBindings: ['width', 'height'],

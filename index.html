@@ -10,10 +10,11 @@
         {{#x-sortable model=group.items tagName="ul" class="sortable-group"}}
           {{#each item in group.items}}
             {{#x-sortable-item model=item tagName="li" class="item"}}
-              {{icon-document}} {{item.name}}
+              <div class="item-content">
+                {{icon-document}} {{item.name}}
+              </div>
             {{/x-sortable-item}}
           {{/each}}
-          {{x-sortable-placeholder tagName="li"}}
         {{/x-sortable}}
       {{/my-group}}
     {{/each}}
