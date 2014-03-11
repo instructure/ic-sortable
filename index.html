@@ -7,7 +7,7 @@
     {{#each group in model}}
       {{#my-group model=group tagName="li" class="group"}}
         <h2>Group {{group.name}}</h2>
-        <ul class="sortable-group">
+        {{#x-sortable-list tagName="ul" class="sortable-group"}}
           {{#each item in group.items}}
             {{#my-item model=item tagName="li" class="item"}}
               <div class="item-content">
@@ -15,7 +15,7 @@
               </div>
             {{/my-item}}
           {{/each}}
-        </ul>
+        {{/x-sortable-list}}
       {{/my-group}}
     {{/each}}
   </ul>
@@ -33,5 +33,8 @@
 <script src="bower_components/jquery/dist/jquery.js"></script>
 <script src="bower_components/handlebars/handlebars.js"></script>
 <script src="bower_components/ember/ember.js"></script>
+<script src="lib/droppable.js"></script>
+<script src="lib/sortable-list.js"></script>
+<script src="lib/sortable.js"></script>
 <script src="app.js"></script>
 
