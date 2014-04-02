@@ -7,7 +7,7 @@
     {{#each group in model}}
       {{#my-group model=group tagName="li" class="group"}}
         <h2>Group {{group.name}}</h2>
-        {{#x-sortable-list tagName="ul" class="sortable-group"}}
+        <ul class="sortable-group">
           {{#each item in group.items}}
             {{#my-item model=item tagName="li" class="item"}}
               <div class="item-content">
@@ -15,7 +15,7 @@
               </div>
             {{/my-item}}
           {{/each}}
-        {{/x-sortable-list}}
+        </ul>
       {{/my-group}}
     {{/each}}
   </ul>

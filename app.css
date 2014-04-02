@@ -51,10 +51,9 @@ ul {
   display: none;
 }
 
-/*.item.is-dragging.on-self {*/
-  /*opacity: 0;*/
-  /*display: block;*/
-/*}*/
+.item.just-started {
+  transition: none !important;
+}
 
 .item {
   transition: padding 150ms linear;
