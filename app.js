@@ -6,8 +6,6 @@ App.ApplicationRoute = Ember.Route.extend({
   }
 });
 
-App.XSortableListComponent = SortableList;
-
 App.MyGroupComponent = Ember.Component.extend(Droppable, {
 
   attributeBindings: ['draggable'],
@@ -33,8 +31,6 @@ App.MyGroupComponent = Ember.Component.extend(Droppable, {
 
 App.MyItemComponent = Ember.Component.extend(Sortable, {
 
-  classNameBindings: ['dropping'],
-
   setEventData: function(event) {
     event.dataTransfer.setData('text/x-item', JSON.stringify(this.get('model')));
   },
@@ -44,8 +40,6 @@ App.MyItemComponent = Ember.Component.extend(Sortable, {
   },
 
   acceptDrop: function(event) {
-    this.set('dropping', true);
-    Ember.run.later(this, 'set', 'dropping', false, 150);
     var data = JSON.parse(event.dataTransfer.getData('text/x-item'));
     var targetGroup = findGroup(data.group_id);
     var targetItem = targetGroup.items.findBy('id', data.id);
@@ -79,26 +73,25 @@ var groups = Ember.ArrayProxy.create({
         {group_id: 0, id: 1, name: 'foo'},
         {group_id: 0, id: 2, name: 'bar'},
         {group_id: 0, id: 3, name: 'baz'},
-        {group_id: 0, id: 4, name: 'qux'},
-        {group_id: 0, id: 5, name: 'quux'},
-        {group_id: 0, id: 6, name: 'hooba'},
-        {group_id: 0, id: 7, name: 'tuba'},
-        {group_id: 0, id: 8, name: 'ding'},
-        {group_id: 0, id: 9, name: 'dong'}
       ]
     },
     {
       id: 1,
       name: 'B',
       items: [
-        {group_id: 1, id: 10, name: 'qux'}
+        {group_id: 1, id: 10, name: 'qux'},
+        {group_id: 1, id: 8, name: 'ding'}
       ]
     },
 
     {
       id: 2,
       name: 'C',
-      items: []
+      items: [
+        {group_id: 2, id: 5, name: 'quux'},
+        {group_id: 2, id: 6, name: 'hooba'},
+        {group_id: 2, id: 7, name: 'tuba'},
+      ]
     }
   ]
 });

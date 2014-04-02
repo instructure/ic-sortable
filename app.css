@@ -17,7 +17,7 @@ ul {
 .group {
   list-style-type: none;
   padding: 10px;
-  /*cursor: -webkit-grab; cursor: -moz-grab;*/
+  cursor: -webkit-grab; cursor: -moz-grab;
 }
 
 .group {
@@ -47,31 +47,6 @@ ul {
   border-bottom-right-radius: 4px;
 }
 
-.item.is-dragging {
-  display: none;
-}
-
-.item.just-started {
-  transition: none !important;
-}
-
-.item {
-  transition: padding 150ms linear;
-  /*transition-delay: 50ms;*/
-}
-
-.item.dropping {
-  transition: none;
-}
-
-.item.drop-below {
-  padding-bottom: 42px;
-}
-
-.item.drop-above {
-  padding-top: 42px;
-}
-
 .group.accepts-drag {
   /*border-color: hsl(212, 92%, 75%);*/
   background: hsl(212, 92%, 80%);
@@ -86,3 +61,27 @@ icon-document {
   user-select: none;
 }
 
+/*
+ * implementaion stuff
+ */
+
+.item {
+  transition: padding 150ms linear;
+}
+
+.item.is-dragging {
+  display: none;
+}
+
+.item.first-target,
+.item.is-dropping {
+  transition: none !important;
+}
+
+.item.drop-below {
+  padding-bottom: 42px;
+}
+
+.item.drop-above {
+  padding-top: 42px;
+}
