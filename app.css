@@ -49,8 +49,12 @@ ul {
 
 .item.is-dragging {
   display: none;
-  /*opacity: 0.2*/
 }
+
+/*.item.is-dragging.on-self {*/
+  /*opacity: 0;*/
+  /*display: block;*/
+/*}*/
 
 .item {
   transition: padding 150ms linear;
