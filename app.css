@@ -54,6 +54,7 @@ ul {
 
 .item {
   transition: padding 150ms linear;
+  /*transition-delay: 50ms;*/
 }
 
 .item.dropping {

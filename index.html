@@ -11,7 +11,7 @@
           {{#each item in group.items}}
             {{#my-item model=item tagName="li" class="item"}}
               <div class="item-content">
-                {{icon-document}} {{item.name}}
+                {{icon-document}} {{item.name}} {{view.elementId}}
               </div>
             {{/my-item}}
           {{/each}}

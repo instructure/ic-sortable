@@ -27,7 +27,9 @@ App.MyGroupComponent = Ember.Component.extend(Droppable, {
       return;
     }
     var dragItem = dragGroup.items.findBy('id', data.id);
-    moveItem(dragItem, dragGroup, myGroup);
+    Ember.run.later(this, function() {
+      moveItem(dragItem, dragGroup, myGroup);
+    });
   }
 });
 
@@ -50,13 +52,15 @@ App.MyItemComponent = Ember.Component.extend(Sortable, {
     var targetGroup = findGroup(data.group_id);
     var targetItem = targetGroup.items.findBy('id', data.id);
     var myGroup = findGroup(this.get('model.group_id'));
-    targetGroup.items.removeObject(targetItem);
-    var index = myGroup.items.indexOf(this.get('model'));
-    if (this.get('droppedPosition') === 'after') {
-      index = index + 1;
-    }
-    targetItem.group_id = myGroup.id;
-    myGroup.items.insertAt(index, targetItem);
+    Ember.run.later(this, function() {
+      targetGroup.items.removeObject(targetItem);
+      var index = myGroup.items.indexOf(this.get('model'));
+      if (this.get('droppedPosition') === 'after') {
+        index = index + 1;
+      }
+      targetItem.group_id = myGroup.id;
+      myGroup.items.insertAt(index, targetItem);
+    });
   }
 
 });
