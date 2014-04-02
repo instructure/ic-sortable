@@ -2,20 +2,24 @@
 <title>dnd</title>
 <link rel="stylesheet" href="app.css">
 
+<body>
+
 <script type="text/x-handlebars">
   <ul id="groups">
     {{#each group in model}}
       {{#my-group model=group tagName="li" class="group"}}
-        <h2>Group {{group.name}}</h2>
-        <ul class="sortable-group">
-          {{#each item in group.items}}
-            {{#my-item model=item tagName="li" class="item"}}
-              <div class="item-content">
-                {{icon-document}} {{item.name}}
-              </div>
-            {{/my-item}}
-          {{/each}}
-        </ul>
+        <div class="group-content">
+          <h2>Group {{group.name}}</h2>
+          <ul class="sortable-group">
+            {{#each item in group.items}}
+              {{#my-item model=item tagName="li" class="item"}}
+                <div class="item-content">
+                  {{icon-document}} {{item.name}}
+                </div>
+              {{/my-item}}
+            {{/each}}
+          </ul>
+        </div>
       {{/my-group}}
     {{/each}}
   </ul>

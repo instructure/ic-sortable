@@ -6,27 +6,72 @@ App.ApplicationRoute = Ember.Route.extend({
   }
 });
 
-App.MyGroupComponent = Ember.Component.extend(Droppable, {
+App.MyGroupComponent = Ember.Component.extend(Sortable, {
 
-  attributeBindings: ['draggable'],
+  attributeBindings: ['accept-type'],
 
-  draggable: "true",
-
-  canAccept: function(event) {
-    return event.dataTransfer.types.contains('text/x-item');
+  setEventData: function(event) {
+    var left = this.get('element').getBoundingClientRect().left;
+    var x = event.originalEvent.clientX - left;
+    var clone = this.$().clone();
+    clone.find('.sortable-group').remove();
+    clone.appendTo(document.body);
+    event.dataTransfer.setDragImage(clone[0], x, 40);
+    Ember.run.later(clone, 'remove', 0);
+    event.dataTransfer.setData('text/x-group', this.get('model.id'));
   },
 
+  accepts: ['text/x-group', 'text/x-item'],
+
+  canAccept: function(event) {
+    if (this.get('selfDrop')) {
+      return false;
+    }
+    var accepts = this.get('accepts');
+    var transfer = event.dataTransfer.types;
+    for (var i = 0, l = accepts.length; i < l; i++) {
+      var type = accepts[i];
+      if (transfer.contains(type)) {
+        this.set('accept-type', type);
+        return true;
+      }
+    }
+    return false;
+  },
+
+  allowDrag: function(event) {
+    // only allow from header
+    return event.target.tagName == 'H2';
+  },
+
+  resetAcceptType: function() {
+    this.set('accept-type', null);
+  }.on('dragLeave'),
+
   acceptDrop: function(event) {
-    var data = JSON.parse(event.dataTransfer.getData('text/x-item'));
+    var type = this.get('accept-type');
+    this['accept:'+type](event, event.dataTransfer.getData(type));
+    this.set('accept-type', null);
+  },
+
+  'accept:text/x-item': function(event, data) {
+    data = JSON.parse(data);
     var myGroup = this.get('model');
     var dragGroup = findGroup(data.group_id);
-    if (myGroup === dragGroup) {
-      console.debug('same group, should reorder', this.get('elementId'));
-      return;
-    }
     var dragItem = dragGroup.items.findBy('id', data.id);
     moveItem(dragItem, dragGroup, myGroup);
+  },
+
+  'accept:text/x-group': function(event, id) {
+    var targetGroup = groups.findBy('id', parseInt(id, 10));
+    groups.removeObject(targetGroup);
+    var index = groups.indexOf(this.get('model'));
+    if (this.get('droppedPosition') === 'after') {
+      index = index + 1;
+    }
+    groups.insertAt(index, targetGroup);
   }
+
 });
 
 App.MyItemComponent = Ember.Component.extend(Sortable, {

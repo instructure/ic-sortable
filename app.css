@@ -16,14 +16,16 @@ ul {
 
 .group {
   list-style-type: none;
-  padding: 10px;
-  cursor: -webkit-grab; cursor: -moz-grab;
 }
 
-.group {
+.group-content {
+  padding: 10px;
   border-radius: 4px;
-  margin: 10px 0;
   background: hsl(212, 10%, 90%);
+}
+
+.group h2 {
+  cursor: -webkit-grab; cursor: -moz-grab;
 }
 
 .item {
@@ -49,7 +51,7 @@ ul {
 
 .group.accepts-drag {
   /*border-color: hsl(212, 92%, 75%);*/
-  background: hsl(212, 92%, 80%);
+  /*background: hsl(212, 92%, 80%);*/
 }
 
 icon-document {
@@ -62,7 +64,7 @@ icon-document {
 }
 
 /*
- * implementaion stuff
+ * implementation stuff
  */
 
 .item {
@@ -84,4 +86,26 @@ icon-document {
 
 .item.drop-above {
   padding-top: 42px;
+}
+
+.group.is-dragging {
+  opacity: 0.2;
+}
+
+.group {
+  padding: 10px 0;
+}
+
+.group[accept-type="text/x-group"].drop-below {
+  padding-bottom: 9px;
+  border-bottom: 1px solid hsl(12, 50%, 50%);
+}
+
+.group[accept-type="text/x-group"].drop-above {
+  padding-top: 9px;
+  border-top: 1px solid hsl(12, 50%, 50%);
+}
+
+.group[accept-type="text/x-item"] .group-content {
+  background: hsl(212, 50%, 85%);
 }
