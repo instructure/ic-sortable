@@ -81,11 +81,11 @@ icon-document {
 }
 
 .item.drop-below {
-  padding-bottom: 42px;
+  padding-bottom: 41px;
 }
 
 .item.drop-above {
-  padding-top: 42px;
+  padding-top: 41px;
 }
 
 .group.is-dragging {
