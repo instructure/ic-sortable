@@ -1,3 +1,5 @@
+var Sortable = ic.Sortable.default;
+
 App = Ember.Application.create();
 
 App.ApplicationRoute = Ember.Route.extend({
@@ -23,8 +25,8 @@ App.MyGroupComponent = Ember.Component.extend(Sortable, {
 
   accepts: ['text/x-group', 'text/x-item'],
 
-  canAccept: function(event) {
-    if (this.get('selfDrop')) {
+  validateDragEvent: function(event) {
+    if (this.get('self-drop')) {
       return false;
     }
     var accepts = this.get('accepts');
@@ -80,7 +82,7 @@ App.MyItemComponent = Ember.Component.extend(Sortable, {
     event.dataTransfer.setData('text/x-item', JSON.stringify(this.get('model')));
   },
 
-  canAccept: function(event) {
+  validateDragEvent: function(event) {
     return event.dataTransfer.types.contains('text/x-item');
   },
 
@@ -107,11 +109,6 @@ App.IconDocumentComponent = Ember.Component.extend({
   width: 16,
   height: 16
 });
-
-window.addEventListener('storage', function(event) {
-  console.log(event);
-});
-
 
 var groups = Ember.ArrayProxy.create({
   content: [
