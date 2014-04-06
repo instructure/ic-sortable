@@ -1,4 +1,5 @@
-import Ember from 'ember';
+"use strict";
+var Ember = require("ember")["default"] || require("ember");
 //import Droppable from 'ic-droppable';
 
 var lastEntered;
@@ -170,5 +171,4 @@ function relativeClientPosition(el, event) {
   };
 }
 
-export default Sortable;
-
+exports["default"] = Sortable;

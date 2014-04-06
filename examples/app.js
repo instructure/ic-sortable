@@ -108,6 +108,10 @@ App.IconDocumentComponent = Ember.Component.extend({
   height: 16
 });
 
+window.addEventListener('storage', function(event) {
+  console.log(event);
+});
+
 
 var groups = Ember.ArrayProxy.create({
   content: [
