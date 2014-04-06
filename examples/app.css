@@ -75,7 +75,7 @@ icon-document {
   display: none;
 }
 
-.item.first-target,
+.item.first-drop-target,
 .item.is-dropping {
   transition: none !important;
 }
