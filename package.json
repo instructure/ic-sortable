@@ -1,6 +1,6 @@
 {
   "name": "ic-sortable",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "description": "Ember component mixin for creating sortable drag and drop ui",
   "main": "dist/cjs/main.js",
   "devDependencies": {

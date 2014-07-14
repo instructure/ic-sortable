@@ -36,6 +36,8 @@ Module Support
 Usage
 -----
 
+Don't use this, its not done.
+
 Contributing
 ------------
 
